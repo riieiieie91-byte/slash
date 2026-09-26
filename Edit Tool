@@ -1,0 +1,28 @@
+getgenv().replacement = Vector3.new(math.huge, -math.huge, math.huge)
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local tool = character:FindFirstChildOfClass("Tool")
+local event = tool and tool:FindFirstChild("Event", true)
+
+if not event then
+    warn("Không tìm thấy Event trong Tool đang cầm")
+    return
+end
+
+local namecall
+
+namecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local args = {...}
+    local method = getnamecallmethod():lower()
+
+    if not checkcaller() and self == event and method == "fireserver" then
+        args[3] = getgenv().replacement
+        return namecall(self, unpack(args))
+    end
+
+    return namecall(self, ...)
+end)
+
+print("Hooked:", tool.Name)
