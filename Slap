@@ -1,0 +1,24 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local tool = character:FindFirstChildOfClass("Tool")
+
+if tool then
+    local event = tool:FindFirstChild("Event", true)
+
+    if event and event:IsA("RemoteEvent") then
+        for _, V in ipairs(game.Players:GetPlayers()) do
+            if V ~= player and V.Character then
+                local targetRoot = V.Character:FindFirstChild("HumanoidRootPart")
+
+                if targetRoot then
+                    event:FireServer(
+                        "slash",
+                        V.Character,
+                        Vector3.new(math.huge, -math.huge, math.huge)
+                    )
+                end
+            end
+        end
+    end
+end
