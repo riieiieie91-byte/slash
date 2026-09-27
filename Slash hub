@@ -1,0 +1,219 @@
+--// SLASH HUB
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+--// GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SlashHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+--// Main
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 280, 0, 190)
+Main.Position = UDim2.new(0.5, -140, 0.5, -95)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Main.BorderSizePixel = 0
+Main.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = Main
+
+--// Shadow
+local Shadow = Instance.new("UIStroke")
+Shadow.Color = Color3.fromRGB(70, 70, 80)
+Shadow.Thickness = 1
+Shadow.Transparency = 0.3
+Shadow.Parent = Main
+
+--// Top bar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 42)
+TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = Main
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 12)
+TopCorner.Parent = TopBar
+
+--// Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -90, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "⚡ SLASH HUB"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 19
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
+--// Close button
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 35, 0, 30)
+Close.Position = UDim2.new(1, -40, 0, 6)
+Close.BackgroundColor3 = Color3.fromRGB(190, 50, 55)
+Close.Text = "×"
+Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+Close.TextSize = 22
+Close.Font = Enum.Font.GothamBold
+Close.Parent = TopBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 8)
+CloseCorner.Parent = Close
+
+--// Button creator
+local function CreateButton(text, position)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0, 240, 0, 48)
+    Button.Position = position
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    Button.BorderSizePixel = 0
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 16
+    Button.Font = Enum.Font.GothamBold
+    Button.AutoButtonColor = false
+    Button.Parent = Main
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 9)
+    Corner.Parent = Button
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(70, 70, 85)
+    Stroke.Thickness = 1
+    Stroke.Parent = Button
+
+    -- Hover
+    Button.MouseEnter:Connect(function()
+        TweenService:Create(
+            Button,
+            TweenInfo.new(0.15),
+            {BackgroundColor3 = Color3.fromRGB(65, 65, 80)}
+        ):Play()
+    end)
+
+    Button.MouseLeave:Connect(function()
+        TweenService:Create(
+            Button,
+            TweenInfo.new(0.15),
+            {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}
+        ):Play()
+    end)
+
+    -- Click effect
+    Button.MouseButton1Down:Connect(function()
+        TweenService:Create(
+            Button,
+            TweenInfo.new(0.08),
+            {Size = UDim2.new(0, 230, 0, 44)}
+        ):Play()
+    end)
+
+    Button.MouseButton1Up:Connect(function()
+        TweenService:Create(
+            Button,
+            TweenInfo.new(0.08),
+            {Size = UDim2.new(0, 240, 0, 48)}
+        ):Play()
+    end)
+
+    return Button
+end
+
+--// Buttons
+local Slap = CreateButton(
+    "👊  Slap",
+    UDim2.new(0.5, -120, 0, 58)
+)
+
+local EditTool = CreateButton(
+    "🛠  Edit Valu Tool",
+    UDim2.new(0.5, -120, 0, 118)
+)
+
+--// Slap
+Slap.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet(
+        "https://raw.githubusercontent.com/riieiieie91-byte/slash/refs/heads/main/Slap"
+    ))()
+end)
+
+--// Edit Tool
+EditTool.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet(
+        "https://raw.githubusercontent.com/riieiieie91-byte/slash/refs/heads/main/Edit%20Tool"
+    ))()
+end)
+
+--// Close / Open
+local OpenButton = Instance.new("TextButton")
+OpenButton.Size = UDim2.new(0, 55, 0, 55)
+OpenButton.Position = UDim2.new(0, 15, 0.5, -27)
+OpenButton.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+OpenButton.Text = "⚡"
+OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.TextSize = 25
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.Visible = false
+OpenButton.Parent = ScreenGui
+
+local OpenCorner = Instance.new("UICorner")
+OpenCorner.CornerRadius = UDim.new(0, 15)
+OpenCorner.Parent = OpenButton
+
+Close.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    OpenButton.Visible = true
+end)
+
+OpenButton.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    OpenButton.Visible = false
+end)
+
+--// Drag system
+local dragging = false
+local dragStart
+local startPos
+
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (
+        input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch
+    ) then
+
+        local delta = input.Position - dragStart
+
+        Main.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
