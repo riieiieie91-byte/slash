@@ -1,0 +1,680 @@
+--[[ Dive Executor v1.3 ]]--
+
+pcall(function()
+    game.CoreGui.DiveExecutor:Destroy()
+end)
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DiveExecutor"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = CoreGui
+
+--==================================================
+-- MAIN FRAME
+--==================================================
+
+local frame = Instance.new("Frame")
+frame.Parent = gui
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 320, 0, 230)
+frame.Position = UDim2.new(0.3, 0, 0.25, 0)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.ClipsDescendants = true
+
+local frameCorner = Instance.new("UICorner")
+frameCorner.Parent = frame
+frameCorner.CornerRadius = UDim.new(0, 12)
+
+--==================================================
+-- BACKGROUND IMAGE
+--==================================================
+
+local background = Instance.new("ImageLabel")
+background.Parent = frame
+background.Name = "Background"
+background.Size = UDim2.new(1, 0, 1, 0)
+background.Position = UDim2.new(0, 0, 0, 0)
+background.BackgroundTransparency = 1
+background.BorderSizePixel = 0
+background.Image = "rbxassetid://121698497637602"
+background.ScaleType = Enum.ScaleType.Stretch
+background.ZIndex = 0
+
+local backgroundCorner = Instance.new("UICorner")
+backgroundCorner.Parent = background
+backgroundCorner.CornerRadius = UDim.new(0, 12)
+
+--==================================================
+-- TITLE
+--==================================================
+
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.Text = "Dive Executor"
+title.Size = UDim2.new(1, 0, 0, 35)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
+title.TextColor3 = Color3.fromRGB(180, 200, 255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.BorderSizePixel = 0
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.Parent = title
+titleCorner.CornerRadius = UDim.new(0, 8)
+
+--==================================================
+-- CLOSE BUTTON
+--==================================================
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = frame
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 3)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+closeBtn.BorderSizePixel = 0
+closeBtn.ZIndex = 10
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.Parent = closeBtn
+closeCorner.CornerRadius = UDim.new(0, 6)
+
+--==================================================
+-- FLOATING ICON
+--==================================================
+
+local openBtn = Instance.new("ImageButton")
+openBtn.Parent = gui
+openBtn.Name = "DiveIcon"
+
+openBtn.Size = UDim2.new(0, 65, 0, 65)
+openBtn.Position = UDim2.new(0, 15, 0.5, -32)
+
+-- CHANGED ONLY THIS IMAGE ID
+openBtn.Image = "rbxassetid://76913689473312"
+
+openBtn.BackgroundTransparency = 1
+openBtn.BorderSizePixel = 0
+openBtn.Visible = false
+openBtn.ZIndex = 100
+openBtn.AutoButtonColor = false
+
+local iconCorner = Instance.new("UICorner")
+iconCorner.Parent = openBtn
+iconCorner.CornerRadius = UDim.new(1, 0)
+
+--==================================================
+-- DRAG ICON
+--==================================================
+
+local dragging = false
+local dragStart
+local startPos
+local moved = false
+
+openBtn.InputBegan:Connect(function(input)
+
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+
+        dragging = true
+        moved = false
+        dragStart = input.Position
+        startPos = openBtn.Position
+
+    end
+
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+    if not dragging then
+        return
+    end
+
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+    or input.UserInputType == Enum.UserInputType.Touch then
+
+        local delta = input.Position - dragStart
+
+        if math.abs(delta.X) > 5
+        or math.abs(delta.Y) > 5 then
+            moved = true
+        end
+
+        openBtn.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+
+    end
+
+end)
+
+UIS.InputEnded:Connect(function(input)
+
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+
+        if dragging and not moved then
+            frame.Visible = true
+            openBtn.Visible = false
+        end
+
+        dragging = false
+
+    end
+
+end)
+
+--==================================================
+-- CLOSE / OPEN
+--==================================================
+
+closeBtn.MouseButton1Click:Connect(function()
+
+    frame.Visible = false
+    openBtn.Visible = true
+
+end)
+
+--==================================================
+-- TAB BAR
+--==================================================
+
+local tabBar = Instance.new("Frame")
+tabBar.Parent = frame
+tabBar.Size = UDim2.new(0, 275, 0, 27)
+tabBar.Position = UDim2.new(0, 10, 0, 40)
+tabBar.BackgroundTransparency = 1
+tabBar.BorderSizePixel = 0
+tabBar.ClipsDescendants = true
+
+local tabs = {}
+local currentTab = 1
+local nextTabId = 1
+
+--==================================================
+-- TEXTBOX
+--==================================================
+
+local textbox = Instance.new("TextBox")
+textbox.Parent = frame
+textbox.PlaceholderText = "-- Paste script here..."
+textbox.Text = ""
+textbox.Position = UDim2.new(0.05, 0, 0.31, 0)
+textbox.Size = UDim2.new(0.9, 0, 0.40, 0)
+
+textbox.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+textbox.TextColor3 = Color3.new(1, 1, 1)
+
+textbox.TextXAlignment = Enum.TextXAlignment.Left
+textbox.TextYAlignment = Enum.TextYAlignment.Top
+
+textbox.ClearTextOnFocus = false
+textbox.MultiLine = true
+textbox.TextWrapped = true
+
+textbox.Font = Enum.Font.Code
+textbox.TextSize = 12
+textbox.BorderSizePixel = 0
+
+local boxCorner = Instance.new("UICorner")
+boxCorner.Parent = textbox
+boxCorner.CornerRadius = UDim.new(0, 8)
+
+--==================================================
+-- NOTIFICATION
+--==================================================
+
+local function notify(message, color)
+
+    local msg = Instance.new("TextLabel")
+    msg.Parent = gui
+
+    msg.Size = UDim2.new(0, 220, 0, 35)
+    msg.Position = UDim2.new(0.35, 0, 0.05, 0)
+
+    msg.BackgroundColor3 =
+        color or Color3.fromRGB(40, 40, 60)
+
+    msg.Text = message
+    msg.Font = Enum.Font.Gotham
+    msg.TextColor3 = Color3.new(1, 1, 1)
+    msg.TextScaled = true
+    msg.BorderSizePixel = 0
+    msg.ZIndex = 200
+
+    local corner = Instance.new("UICorner")
+    corner.Parent = msg
+    corner.CornerRadius = UDim.new(0, 8)
+
+    task.spawn(function()
+
+        task.wait(2.5)
+
+        for i = 1, 10 do
+
+            msg.TextTransparency += 0.1
+            msg.BackgroundTransparency += 0.1
+
+            task.wait(0.05)
+        end
+
+        msg:Destroy()
+
+    end)
+
+end
+
+--==================================================
+-- CREATE TAB
+--==================================================
+
+local function createTabButton(tab)
+
+    local button = Instance.new("TextButton")
+    button.Parent = tabBar
+
+    button.Name = "TabButton"
+
+    button.Size = UDim2.new(0, 72, 0, 25)
+
+    button.BackgroundColor3 =
+        Color3.fromRGB(40, 40, 60)
+
+    button.TextColor3 = Color3.new(1, 1, 1)
+
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 10
+
+    button.BorderSizePixel = 0
+
+    button.Text = tab.name
+
+    local corner = Instance.new("UICorner")
+    corner.Parent = button
+    corner.CornerRadius = UDim.new(0, 5)
+
+    local delete = Instance.new("TextButton")
+    delete.Parent = button
+
+    delete.Name = "Delete"
+    delete.Text = "X"
+
+    delete.Size = UDim2.new(0, 18, 0, 18)
+    delete.Position = UDim2.new(1, -20, 0, 3)
+
+    delete.BackgroundTransparency = 1
+
+    delete.TextColor3 =
+        Color3.fromRGB(255, 100, 100)
+
+    delete.Font = Enum.Font.GothamBold
+    delete.TextSize = 10
+
+    delete.BorderSizePixel = 0
+
+    button.MouseButton1Click:Connect(function()
+
+        if currentTab ~= tab.id then
+
+            tabs[currentTab].text =
+                textbox.Text
+
+            currentTab = tab.id
+
+            textbox.Text =
+                tab.text
+
+        end
+
+    end)
+
+    delete.MouseButton1Click:Connect(function()
+
+        if #tabs <= 1 then
+
+            notify(
+                "Cannot delete the last tab",
+                Color3.fromRGB(255, 80, 80)
+            )
+
+            return
+        end
+
+        for i, t in ipairs(tabs) do
+
+            if t == tab then
+
+                table.remove(tabs, i)
+
+                break
+            end
+        end
+
+        button:Destroy()
+
+        for i, t in ipairs(tabs) do
+
+            t.id = i
+
+            if t.button then
+
+                t.button.Position =
+                    UDim2.new(
+                        0,
+                        (i - 1) * 75,
+                        0,
+                        0
+                    )
+
+            end
+        end
+
+        currentTab =
+            math.clamp(
+                currentTab,
+                1,
+                #tabs
+            )
+
+        textbox.Text =
+            tabs[currentTab].text
+
+    end)
+
+    tab.button = button
+
+    button.Position =
+        UDim2.new(
+            0,
+            (#tabs - 1) * 75,
+            0,
+            0
+        )
+
+end
+
+--==================================================
+-- FIRST TAB
+--==================================================
+
+local firstTab = {
+    id = 1,
+    name = "Script 1",
+    text = ""
+}
+
+table.insert(tabs, firstTab)
+
+createTabButton(firstTab)
+
+--==================================================
+-- ADD TAB
+--==================================================
+
+local addTabBtn = Instance.new("TextButton")
+addTabBtn.Parent = frame
+
+addTabBtn.Text = "+"
+
+addTabBtn.Size =
+    UDim2.new(0, 25, 0, 25)
+
+addTabBtn.Position =
+    UDim2.new(1, -35, 0, 40)
+
+addTabBtn.BackgroundColor3 =
+    Color3.fromRGB(50, 150, 100)
+
+addTabBtn.TextColor3 =
+    Color3.new(1, 1, 1)
+
+addTabBtn.Font =
+    Enum.Font.GothamBold
+
+addTabBtn.TextSize = 18
+
+addTabBtn.BorderSizePixel = 0
+
+local addCorner = Instance.new("UICorner")
+addCorner.Parent = addTabBtn
+addCorner.CornerRadius = UDim.new(0, 5)
+
+addTabBtn.MouseButton1Click:Connect(function()
+
+    tabs[currentTab].text =
+        textbox.Text
+
+    nextTabId += 1
+
+    local newTab = {
+
+        id = #tabs + 1,
+
+        name =
+            "Script " .. nextTabId,
+
+        text = ""
+    }
+
+    table.insert(tabs, newTab)
+
+    currentTab =
+        newTab.id
+
+    createTabButton(newTab)
+
+    textbox.Text = ""
+
+    notify(
+        "➕ " .. newTab.name .. " created",
+        Color3.fromRGB(50, 180, 120)
+    )
+
+end)
+
+--==================================================
+-- ATTACH
+--==================================================
+
+local attachBtn = Instance.new("TextButton")
+attachBtn.Parent = frame
+
+attachBtn.Text = "Attach"
+
+attachBtn.Size =
+    UDim2.new(0, 70, 0, 28)
+
+attachBtn.Position =
+    UDim2.new(0.05, 0, 0.82, 0)
+
+attachBtn.BackgroundColor3 =
+    Color3.fromRGB(40, 100, 200)
+
+attachBtn.TextColor3 =
+    Color3.new(1, 1, 1)
+
+attachBtn.Font =
+    Enum.Font.GothamBold
+
+attachBtn.TextScaled = true
+
+attachBtn.BorderSizePixel = 0
+
+local attachCorner = Instance.new("UICorner")
+attachCorner.Parent = attachBtn
+attachCorner.CornerRadius = UDim.new(0, 8)
+
+attachBtn.MouseButton1Click:Connect(function()
+
+    notify(
+        "Attached to Roblox Player",
+        Color3.fromRGB(0, 200, 255)
+    )
+
+end)
+
+--==================================================
+-- CLEAR
+--==================================================
+
+local clearBtn = Instance.new("TextButton")
+clearBtn.Parent = frame
+
+clearBtn.Text = "Clear"
+
+clearBtn.Size =
+    UDim2.new(0, 70, 0, 28)
+
+clearBtn.Position =
+    UDim2.new(0.39, 0, 0.82, 0)
+
+clearBtn.BackgroundColor3 =
+    Color3.fromRGB(100, 80, 180)
+
+clearBtn.TextColor3 =
+    Color3.new(1, 1, 1)
+
+clearBtn.Font =
+    Enum.Font.GothamBold
+
+clearBtn.TextScaled = true
+
+clearBtn.BorderSizePixel = 0
+
+local clearCorner = Instance.new("UICorner")
+clearCorner.Parent = clearBtn
+clearCorner.CornerRadius = UDim.new(0, 8)
+
+clearBtn.MouseButton1Click:Connect(function()
+
+    textbox.Text = ""
+    tabs[currentTab].text = ""
+
+    notify(
+        "🗑 Script cleared",
+        Color3.fromRGB(100, 80, 180)
+    )
+
+end)
+
+--==================================================
+-- EXECUTE
+--==================================================
+
+local execBtn = Instance.new("TextButton")
+execBtn.Parent = frame
+
+execBtn.Text = "Execute"
+
+execBtn.Size =
+    UDim2.new(0, 70, 0, 28)
+
+execBtn.Position =
+    UDim2.new(0.73, 0, 0.82, 0)
+
+execBtn.BackgroundColor3 =
+    Color3.fromRGB(0, 200, 120)
+
+execBtn.TextColor3 =
+    Color3.new(1, 1, 1)
+
+execBtn.Font =
+    Enum.Font.GothamBold
+
+execBtn.TextScaled = true
+
+execBtn.BorderSizePixel = 0
+
+local execCorner = Instance.new("UICorner")
+execCorner.Parent = execBtn
+execCorner.CornerRadius = UDim.new(0, 8)
+
+execBtn.MouseButton1Click:Connect(function()
+
+    local code =
+        textbox.Text
+
+    if code == "" then
+
+        notify(
+            "❌ No script to execute",
+            Color3.fromRGB(255, 80, 80)
+        )
+
+        return
+    end
+
+    local success, err =
+        pcall(function()
+
+            loadstring(code)()
+
+        end)
+
+    if success then
+
+        notify(
+            "✅ Script executed!",
+            Color3.fromRGB(50, 255, 100)
+        )
+
+    else
+
+        notify(
+            "❌ Error: " .. tostring(err),
+            Color3.fromRGB(255, 50, 50)
+        )
+
+    end
+
+end)
+
+--==================================================
+-- RIGHT SHIFT
+--==================================================
+
+local open = true
+
+UIS.InputBegan:Connect(function(input, gpe)
+
+    if gpe then
+        return
+    end
+
+    if input.KeyCode ==
+        Enum.KeyCode.RightShift then
+
+        open = not open
+
+        frame.Visible = open
+        openBtn.Visible = not open
+
+    end
+
+end)
+
+--==================================================
+-- LAUNCH
+--==================================================
+
+notify(
+    "Dive Executor has launched.",
+    Color3.fromRGB(0, 120, 255)
+)
