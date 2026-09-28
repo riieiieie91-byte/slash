@@ -1,0 +1,90 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/riieiieie91-byte/slash/refs/heads/main/DiveExecutor_v1.3_350x250.lua"))()
+
+
+--==================================================
+-- ADD X BUTTON FOR SAVED FILES
+--==================================================
+task.spawn(function()
+    local CoreGui = game:GetService("CoreGui")
+
+    -- Chờ Dive Executor gốc tạo giao diện
+    local gui
+    repeat
+        task.wait(0.2)
+        gui = CoreGui:FindFirstChild("DiveExecutor")
+    until gui
+
+    local frame = gui:FindFirstChild("MainFrame")
+    if not frame then return end
+
+    local fileList = frame:FindFirstChild("FileList")
+    if not fileList then return end
+
+    local function addDeleteButton(row)
+        if not row or not row:IsA("TextButton") then return end
+        if row:FindFirstChild("FileDeleteButton") then return end
+
+        local deleteBtn = Instance.new("TextButton")
+        deleteBtn.Name = "FileDeleteButton"
+        deleteBtn.Parent = row
+        deleteBtn.Text = "X"
+        deleteBtn.Size = UDim2.new(0, 26, 0, 26)
+        deleteBtn.Position = UDim2.new(1, -30, 0, 3)
+        deleteBtn.BackgroundColor3 = Color3.fromRGB(200, 55, 55)
+        deleteBtn.TextColor3 = Color3.new(1, 1, 1)
+        deleteBtn.Font = Enum.Font.GothamBold
+        deleteBtn.TextSize = 12
+        deleteBtn.BorderSizePixel = 0
+        deleteBtn.ZIndex = 100
+
+        local corner = Instance.new("UICorner")
+        corner.Parent = deleteBtn
+        corner.CornerRadius = UDim.new(0, 6)
+
+        deleteBtn.MouseButton1Click:Connect(function()
+            if not delfile then
+                return
+            end
+
+            -- Lấy tên file từ dòng đang hiển thị
+            local displayName = row.Text or ""
+            local fileName = displayName:gsub("^📄%s*", "")
+
+            if fileName == "" then
+                return
+            end
+
+            local path = "DiveExecutor/" .. fileName
+
+            local success, err = pcall(function()
+                delfile(path)
+            end)
+
+            if success then
+                row:Destroy()
+
+                -- Cập nhật CanvasSize
+                task.defer(function()
+                    local layout = fileList:FindFirstChildOfClass("UIListLayout")
+                    if layout then
+                        fileList.CanvasSize = UDim2.new(
+                            0, 0, 0, layout.AbsoluteContentSize.Y + 10
+                        )
+                    end
+                end)
+            end
+        end)
+    end
+
+    -- Thêm X cho các file đang có
+    for _, child in ipairs(fileList:GetChildren()) do
+        addDeleteButton(child)
+    end
+
+    -- File mới được refresh cũng tự có X
+    fileList.ChildAdded:Connect(function(child)
+        task.defer(function()
+            addDeleteButton(child)
+        end)
+    end)
+end)
