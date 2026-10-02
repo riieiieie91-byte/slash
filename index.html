@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PTJSCRIPT</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div class="logo">PTJ<span>SCRIPT</span></div>
+  <nav>
+    <button onclick="openAuth()">ĐĂNG NHẬP</button>
+    <button id="adminBtn" class="hidden" onclick="openAdmin()">ADMIN</button>
+    <button id="logoutBtn" class="hidden" onclick="logout()">ĐĂNG XUẤT</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <p class="tag">LUA SCRIPT HUB</p>
+    <h1>PTJSCRIPT</h1>
+    <p>Kho script Lua của PTJ.</p>
+    <a href="#scripts" class="mainBtn">XEM SCRIPT</a>
+  </div>
+</section>
+
+<main id="scripts">
+  <h2>Scripts</h2>
+  <div id="grid" class="grid"></div>
+</main>
+
+<div id="auth" class="modal hidden">
+ <div class="box">
+  <button class="close" onclick="closeAll()">×</button>
+  <h2 id="authTitle">Đăng nhập</h2>
+  <input id="username" placeholder="Tên đăng nhập">
+  <input id="password" type="password" placeholder="Mật khẩu">
+  <button class="mainBtn" onclick="login()">Đăng nhập</button>
+  <button class="linkBtn" onclick="switchAuth()">Chuyển sang đăng ký</button>
+  <p id="msg"></p>
+ </div>
+</div>
+
+<div id="admin" class="modal hidden">
+ <div class="box adminBox">
+  <button class="close" onclick="closeAll()">×</button>
+  <h2>PTJ ADMIN</h2>
+  <input id="sname" placeholder="Tên script">
+  <textarea id="scode" placeholder="Mã Lua..."></textarea>
+  <input id="simage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+  <button class="mainBtn" onclick="saveScript()">THÊM SCRIPT</button>
+  <div id="adminList"></div>
+ </div>
+</div>
+
+<div id="view" class="modal hidden">
+ <div class="box">
+  <button class="close" onclick="closeAll()">×</button>
+  <h2 id="viewTitle"></h2>
+  <pre id="code"></pre>
+  <button class="mainBtn" onclick="copyCode()">COPY SCRIPT</button>
+ </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
