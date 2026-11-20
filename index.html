@@ -1,68 +1,80 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PTJSCRIPT</title>
-<link rel="stylesheet" href="/style.css">
-</head>
-<body>
-<header>
-  <div class="logo">PTJ<span>SCRIPT</span></div>
-  <nav>
-    <button onclick="openAuth()">ĐĂNG NHẬP</button>
-    <button id="adminBtn" class="hidden" onclick="openAdmin()">ADMIN</button>
-    <button id="logoutBtn" class="hidden" onclick="logout()">ĐĂNG XUẤT</button>
-  </nav>
-</header>
-
-<section class="hero">
-  <div>
-    <p class="tag">LUA SCRIPT HUB</p>
-    <h1>PTJSCRIPT</h1>
-    <p>Kho script Lua của PTJ.</p>
-    <a href="#scripts" class="mainBtn">XEM SCRIPT</a>
-  </div>
-</section>
-
-<main id="scripts">
-  <h2>Scripts</h2>
-  <div id="grid" class="grid"></div>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Thổi Bong Bóng 🫧</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100svh;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;color:#fff;background:linear-gradient(#168cf4 0%,#70d5ff 58%,#a5e9d0 100%)}
+.sky{position:absolute;inset:0;background:radial-gradient(circle at 80% 8%,#fff8 0 2%,transparent 12%),linear-gradient(transparent 70%,#58b96f 70%);z-index:-2}
+.cloud{position:absolute;background:#ffffffb8;filter:blur(2px);width:170px;height:48px;border-radius:60px;top:22%;left:-30px}.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%;width:75px;height:75px;top:-30px;left:28px}.cloud:after{left:85px;top:-18px;width:65px;height:65px}
+.cloud.c2{top:38%;left:auto;right:-50px;transform:scale(1.2)}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;gap:8px}
+h1{font-size:clamp(25px,7vw,42px);line-height:1;margin:0;text-shadow:0 3px 0 #8149b7,0 5px 10px #164caa}
+.stats{background:#123b86b8;border:2px solid #8ceaff;border-radius:18px;padding:8px 12px;font-weight:800;font-size:14px;white-space:nowrap}
+main{height:calc(100svh - 80px);display:flex;flex-direction:column;align-items:center;justify-content:space-around;padding:5px 14px 18px}
+.instructions{background:#123d83a8;border:1px solid #b9f6ff;border-radius:16px;padding:10px 14px;font-size:13px;line-height:1.55;text-align:center;max-width:330px}
+.bubble-wrap{height:min(48vh,390px);width:min(80vw,390px);display:grid;place-items:center;position:relative}
+.bubble{width:115px;height:115px;border-radius:50%;position:relative;background:radial-gradient(ellipse at 28% 22%,#fff 0 2%,#ffffff9c 4%,transparent 19%),radial-gradient(circle at 70% 75%,#76eaff88,transparent 40%),linear-gradient(135deg,#ff8ce780,#71eaff88 35%,#c9a0ff88 65%,#a4fff088);border:2px solid #ffffffb8;box-shadow:inset -10px -12px 22px #6b70ed33,inset 8px 8px 18px #fff9,0 0 28px #c8faff88;transition:width .08s,height .08s}
+.bubble:after{content:"";position:absolute;top:15%;left:19%;width:22%;height:12%;border-radius:50%;background:#fff9;transform:rotate(-35deg);filter:blur(1px)}
+.bubble.float{animation:float 2.5s ease-in forwards}@keyframes float{to{transform:translateY(-120vh) scale(.8);opacity:0}}
+.mic{border:0;border-radius:50%;width:78px;height:78px;color:white;background:linear-gradient(145deg,#25c7ff,#315be7);box-shadow:0 0 0 6px #ffffff50,0 8px 24px #1455ae88;font-size:32px}
+.mic.active{background:linear-gradient(145deg,#34e68c,#00a6a0);box-shadow:0 0 0 7px #7dffb866,0 0 30px #00ffa8}
+#status{font-weight:800;text-align:center;margin-top:9px;text-shadow:0 2px 4px #164caa}
+.meter{width:min(92vw,420px);height:18px;background:#14377e;border:2px solid #fff;border-radius:30px;overflow:hidden;margin-top:8px}
+#bar{height:100%;width:0;background:linear-gradient(90deg,#35ef8a,#ffe34b,#ff873e);border-radius:30px;transition:width .08s}
+.small{font-size:12px;text-align:center;text-shadow:0 1px 3px #164caa;max-width:330px}
+button{cursor:pointer}#reset{border:1px solid #fff9;background:#123d83a8;color:white;border-radius:14px;padding:9px 15px;font-weight:700}
+</style></head>
+<body><div class="sky"></div><div class="cloud"></div><div class="cloud c2"></div>
+<header><h1>🫧 Thổi Bong Bóng</h1><div class="stats">🏆 Điểm: <span id="score">0</span></div></header>
+<main>
+<div class="instructions">🎤 Nhấn <b>BẮT ĐẦU</b> và cho phép dùng micro.<br>Thổi về phía micro để bong bóng lớn lên.<br>Ngừng thổi để bong bóng bay lên trời!</div>
+<div class="bubble-wrap"><div class="bubble" id="bubble"></div></div>
+<div><button class="mic" id="start" aria-label="Bắt đầu">🎙️</button><div id="status">Chạm micro để bắt đầu</div></div>
+<div class="meter"><div id="bar"></div></div>
+<div class="small">Lưu ý: micro nhận âm thanh, nên tiếng gió hoặc tiếng ồn cũng có thể làm bong bóng lớn.</div>
+<button id="reset">↻ Chơi lại</button>
 </main>
-
-<div id="auth" class="modal hidden">
- <div class="box">
-  <button class="close" onclick="closeAll()">×</button>
-  <h2 id="authTitle">Đăng nhập</h2>
-  <input id="username" placeholder="Tên đăng nhập">
-  <input id="password" type="password" placeholder="Mật khẩu">
-  <button class="mainBtn" onclick="login()">Đăng nhập</button>
-  <button class="linkBtn" onclick="switchAuth()">Chuyển sang đăng ký</button>
-  <p id="msg"></p>
- </div>
-</div>
-
-<div id="admin" class="modal hidden">
- <div class="box adminBox">
-  <button class="close" onclick="closeAll()">×</button>
-  <h2>PTJ ADMIN</h2>
-  <input id="sname" placeholder="Tên script">
-  <textarea id="scode" placeholder="Mã Lua..."></textarea>
-  <input id="simage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-  <button class="mainBtn" onclick="saveScript()">THÊM SCRIPT</button>
-  <div id="adminList"></div>
- </div>
-</div>
-
-<div id="view" class="modal hidden">
- <div class="box">
-  <button class="close" onclick="closeAll()">×</button>
-  <h2 id="viewTitle"></h2>
-  <pre id="code"></pre>
-  <button class="mainBtn" onclick="copyCode()">COPY SCRIPT</button>
- </div>
-</div>
-
-<script src="/app.js"></script>
-</body>
-</html>
+<script>
+const start=document.querySelector('#start'), bubble=document.querySelector('#bubble'), statusEl=document.querySelector('#status'), bar=document.querySelector('#bar'), scoreEl=document.querySelector('#score');
+let audioCtx, analyser, stream, raf, size=115, score=0, lastBlow=0, active=false, flying=false;
+function setSize(n){size=Math.max(70,Math.min(340,n));bubble.style.width=size+'px';bubble.style.height=size+'px'}
+function stopMic(){
+ active=false;cancelAnimationFrame(raf);start.classList.remove('active');start.textContent='🎙️';
+ if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
+ if(audioCtx){audioCtx.close();audioCtx=null}
+ statusEl.textContent='Đã dừng micro · Nhấn để tiếp tục';
+}
+async function begin(){
+ if(active){stopMic();return}
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  analyser=audioCtx.createAnalyser();analyser.fftSize=1024;
+  audioCtx.createMediaStreamSource(stream).connect(analyser);
+  active=true;start.classList.add('active');start.textContent='⏹️';statusEl.textContent='Đang nghe… hãy thổi nhẹ!';
+  const data=new Uint8Array(analyser.fftSize);
+  function loop(){
+   if(!active)return;
+   analyser.getByteTimeDomainData(data);
+   let sum=0;for(let v of data){let x=(v-128)/128;sum+=x*x}
+   let rms=Math.sqrt(sum/data.length), level=Math.max(0,Math.min(100,(rms-.018)*850));
+   bar.style.width=level+'%';
+   const now=Date.now();
+   if(level>12){
+    lastBlow=now;flying=false;bubble.classList.remove('float');
+    setSize(size+Math.min(2.2,level/28));
+    statusEl.textContent='🫧 Bong bóng đang lớn lên!';
+   }else if(now-lastBlow>1200 && size>115 && !flying){
+    flying=true;bubble.classList.add('float');score+=Math.round(size);scoreEl.textContent=score;
+    setTimeout(()=>{if(flying){bubble.classList.remove('float');setSize(115);flying=false}},2600);
+    statusEl.textContent='✨ Bong bóng bay lên!';
+   }else if(now-lastBlow>1200){statusEl.textContent='Thổi vào micro để bơm bong bóng';}
+   raf=requestAnimationFrame(loop);
+  }loop();
+ }catch(e){statusEl.textContent='Không mở được micro. Hãy cấp quyền micro và mở trang bằng HTTPS hoặc localhost.';start.textContent='🎙️';}
+}
+start.addEventListener('click',begin);
+document.querySelector('#reset').addEventListener('click',()=>{stopMic();setSize(115);score=0;scoreEl.textContent='0';bar.style.width='0';lastBlow=0;flying=false;bubble.classList.remove('float');statusEl.textContent='Chạm micro để bắt đầu'});
+if(!navigator.mediaDevices?.getUserMedia){statusEl.textContent='Trình duyệt cần hỗ trợ micro và HTTPS để chơi.'}
+</script></body></html>
